@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tie", "Tie.csproj", "{C3A1CB2B-FEA9-4E11-8C41-862E3C75EF8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiconcompFramework", "..\LiconcompFramework\LiconcompFramework.csproj", "{6AF92A3E-08D6-40B5-90B7-4DB07B3083F9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C3A1CB2B-FEA9-4E11-8C41-862E3C75EF8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3A1CB2B-FEA9-4E11-8C41-862E3C75EF8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3A1CB2B-FEA9-4E11-8C41-862E3C75EF8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3A1CB2B-FEA9-4E11-8C41-862E3C75EF8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AF92A3E-08D6-40B5-90B7-4DB07B3083F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AF92A3E-08D6-40B5-90B7-4DB07B3083F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AF92A3E-08D6-40B5-90B7-4DB07B3083F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AF92A3E-08D6-40B5-90B7-4DB07B3083F9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

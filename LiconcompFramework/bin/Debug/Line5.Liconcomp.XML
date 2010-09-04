@@ -1,0 +1,701 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Line5.Liconcomp</name>
+    </assembly>
+    <members>
+        <member name="T:Line5.Liconcomp.VideoFileLoopFinishedEvent">
+            <summary>
+            Ein Ereignis, welches ausgelöst wird wenn ein Video einmal komplett
+            abgespielt wurde.
+            </summary>
+            <param name="videoFile">Die Instanz der Video Klasse, deren Video
+            einmal komplett abgespielt wurde.</param>
+            <param name="Args">Argumente.</param>
+        </member>
+        <member name="T:Line5.Liconcomp.VideoFile">
+            <summary>
+            Eine Klasse, die Methoden und Eigenschaften zur Verfügung stellt um
+            Videos abzuspielen.
+            </summary>
+        </member>
+        <member name="T:Line5.Liconcomp.Element">
+            <summary>
+            Diese Klasse kapselt ein sichtbares Element im Liconcomp Fenster.
+            Es kann keine Instanz dieser Klasse erstellt werden. Sie wird von
+            <see cref="T:Line5.Liconcomp.VideoFile"/> genutzt um gemeinsame Eigenschaften und
+            Methoden bereitzustellen.
+            </summary>
+            <threadsafety static="true" instance="false"/>
+        </member>
+        <member name="T:Line5.Liconcomp.Disposable">
+            <summary>
+            Eine Hilfsklasse um die Schnittstelle <seealso cref="T:System.IDisposable"/> zu
+            implementieren.
+            </summary>
+            <remarks>
+            <para>
+            Diese Klasse wird von vielen Komponenten des Frameworks verwendet, um
+            Ressourcen wieder freizugeben. Sie implementiert das <see cref="E:Line5.Liconcomp.Disposable.OnDisposing"/>
+            Ereignis und bietet geschützte Methoden für Unterklassen, um Fehler
+            zu werfen falls auf Funktionalität uzugegriffen wird, obwohl die Instanz
+            bereits freigegeben wurde.
+            </para>
+            </remarks>
+            <threadsafety static="true" instance="false"/>
+        </member>
+        <member name="F:Line5.Liconcomp.Disposable._disposed">
+            <summary>
+            Gibt an, ob diese Instanz bereits freigegeben wurde. Wird von
+            <see cref="M:Line5.Liconcomp.Disposable.Dispose"/> auf <see langword="true"/> gesetzt und
+            von <see cref="M:Line5.Liconcomp.Disposable.CheckDisposed"/> überprüft.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.Disposable.Finalize">
+            <summary>
+            Überschrieben, um die Freigabe durchzuführen. Wird nur dann aufgerufen,
+            wenn die Instanz vom Garbage Collector freigegeben wird!
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.Disposable.Dispose">
+            <summary>
+            Gibt die Instanz dieser Klasse frei. Nach dem Aufruf von <see cref="M:Line5.Liconcomp.Disposable.Dispose"/>
+            kann die Instanz nicht mehr benutzt werden. Sollten weiterhin Methoden aufgerufen
+            oder Eigenschaften abgefragt werden wird eine <seealso cref="T:System.ObjectDisposedException"/>
+            ausgelöst. Der mehrmalige Aufruf von <see cref="M:Line5.Liconcomp.Disposable.Dispose"/> ist jedoch gestattet.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.Disposable.FireDisposingEvent">
+            <summary>
+            Löst das <see cref="E:Line5.Liconcomp.Disposable.OnDisposing"/> Ereignis aus.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.Disposable.Dispose(System.Boolean)">
+            <summary>
+            Interne Methode um alle Instanzvariablen freizugeben. Diese Methode sollte von
+            erbenden Klassen überschrieben werden.
+            </summary>
+            <param name="Disposing"><see langword="true"/>, wenn der Aufruf vom Garbage
+            Collector stammt, sonst <see langword="false"/>.</param>
+        </member>
+        <member name="M:Line5.Liconcomp.Disposable.CheckDisposed">
+            <summary>
+            Eine geschützte Methode um sicherzustellen, dass die Instanz der Klasse noch
+            nicht freigegeben wurde. Wirde sie freigegeben wird diese Methode eine
+            <seealso cref="T:System.ObjectDisposedException"/> auslösen.
+            </summary>
+            <exception cref="T:System.ObjectDisposedException">Wird ausgelöst, wenn die Instanz
+            bereits durch den Aufruf von <see cref="M:Line5.Liconcomp.Disposable.Dispose"/> freigegeben wurde.</exception>
+        </member>
+        <member name="E:Line5.Liconcomp.Disposable.OnDisposing">
+            <summary>
+            Wird ausgelöst, kurz bevor die Instanz der Klasse freigegeben wird.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.Disposable.Disposed">
+            <summary>
+            Gibt an, ob diese Instanz bereits durch den Aufruf von <see cref="M:Line5.Liconcomp.Disposable.Dispose"/>
+            freigegeben wurde oder nicht.
+            </summary>
+        </member>
+        <member name="F:Line5.Liconcomp.Element._player">
+            <summary>
+            Eine Referenz auf den Player, der dieses Element erstellt hat.
+            </summary>
+        </member>
+        <member name="F:Line5.Liconcomp.Element._object">
+            <summary>
+            Das gekapselte COM Objekt. Alle in Liconcomp sichtbaren Objekte
+            erben von <see cref="T:Liconcomp.IElement"/>.
+            </summary>
+        </member>
+        <member name="F:Line5.Liconcomp.Element._position">
+            <summary>
+            In Liconcomp hat jedes Element eine Movement. Positionen können
+            auch animiert werden. Da wir nicht nur die COM Movement brauchen
+            sondern auch die gewrappte Movement müssen wir hier die .Net 
+            Wrapper Klasse zwischenspeichern.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.Element.#ctor(Line5.Liconcomp.Player,Liconcomp.IElement)">
+            <summary>
+            Konstruktor, der eine Referenz des Players und das Element übernimmt,
+            welches gewrappt werden soll.
+            </summary>
+            <param name="Player">Eine Referenz auf den <seealso cref="T:Line5.Liconcomp.Player"/>.
+            Darf nicht <see langword="null"/> sein.</param>
+            <param name="Element">Das COM Objekt, welches von dieser Instanz
+            kontrolliert werden soll. Muss <see cref="T:Liconcomp.IElement"/>
+            implementieren und darf nicht <see langword="null"/> sein.</param>
+        </member>
+        <member name="M:Line5.Liconcomp.Element.Dispose(System.Boolean)">
+            <summary>
+            Interne Methode um alle Instanzvariablen freizugeben. Diese Methode sollte von
+            erbenden Klassen überschrieben werden.
+            </summary>
+            <param name="Disposing"><see langword="true"/>, wenn der Aufruf vom Garbage
+            Collector stammt, sonst <see langword="false"/>.</param>
+        </member>
+        <member name="M:Line5.Liconcomp.Element.FireOnRemove(System.Object)">
+            <summary>
+            Löst das <see cref="E:Line5.Liconcomp.Element.OnRemove"/> Ereignis aus. Diese Methode wird von Liconcomp
+            aufgerufen.
+            </summary>
+            <remarks>
+            <para>
+            Die Dispatchinterfaces wie sie Liconcomp definiert werden nicht vererbt. Dadurch
+            gibt es keine Schnittstelle "global::Liconcomp.IElementEvents_Event", welche das
+            "OnRemove" Ereignis definiert. Statt dessen definiert jede Eregnisschnittstelle
+            alle Ereignisse ihrer übergeordneten Klassen. Deshalb wird diese Methode nur in
+            erbenden Klassen benutzt (<see cref="M:Line5.Liconcomp.VideoFile.HookEvents"/>).
+            </para>
+            </remarks>
+            <param name="element">Das Element, welches entfernt wurde.</param>
+        </member>
+        <member name="M:Line5.Liconcomp.Element.HookEvents">
+            <summary>
+            Wird von erbenden Klassen überschrieben um Ereignisbehandlungsmethoden zu
+            registrieren.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.Element.UnhookEvents">
+            <summary>
+            Wird von erbenden Klassen überschrieben um Ereignisbehandlungsmethoden zu
+            entfernen.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.Element.Remove">
+            <summary>
+            Entfernt das Element vom Bildschirm und gibt es frei. Einmal entfernte
+            Elemente können nicht wieder angezeigt werden. Diese Methode löst das Ereignis
+            <see cref="E:Line5.Liconcomp.Element.OnRemove"/> aus und ruft <see cref="M:Line5.Liconcomp.Disposable.Dispose"/> auf.
+            </summary>
+            <remarks>
+            <para>
+            Um Element nur kurz vom Bildschirm zu entfernen setzen Sie deren
+            <see cref="P:Line5.Liconcomp.Element.Visible"/> Eigenschaft auf <see langword="false"/>.
+            </para></remarks>
+        </member>
+        <member name="E:Line5.Liconcomp.Element.OnRemove">
+            <summary>
+            Ein Ereignis welches ausgelöst wird, wenn das Objekt mit einem
+            Aufruf von <see cref="M:Line5.Liconcomp.Element.Remove"/> vom Bildschirm entfernt wird.
+            Einmal entfernte Objekte können nicht wieder angezeigt werden!
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.Element.COMObject">
+            <summary>
+            Liefert das gewrappte COM Objekt zurück.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.Element.Height">
+            <summary>
+            Liefert die Höhe des Elements in Bildpunkten (Pixel) zurück.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.Element.Movement">
+            <summary>
+            Gibt das dem Element zugewiesene <see cref="P:Line5.Liconcomp.Element.Movement"/> zurück oder setzt
+            es. Das Movement gibt an, wo auf dem Bildschirm sich das Element befindet.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.Element.Visible">
+            <summary>
+            Gibt an, ob das Element sichtbar oder unsichtbar ist.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.Element.Width">
+            <summary>
+            Liefert die Breite des Elements in Bildpunkten (Pixel) zurück.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.Element.zIndex">
+            <summary>
+            Liefert den zIndex des Elements zurück oder setzt diesen. Der zIndex
+            bestimmt, in welcher Reihenfolge 2 dimensionale Elemente gezeichnet werden.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.VideoFile.#ctor(Line5.Liconcomp.Player,Liconcomp.IVideoFile)">
+            <summary>
+            Standardkonstruktor.
+            </summary>
+            <param name="Player">Eine Referenz auf das <see cref="T:Line5.Liconcomp.Player"/> Objekt.</param>
+            <param name="VideoFile">Das COM Objekt, welches gewrappt werden soll.</param>
+        </member>
+        <member name="M:Line5.Liconcomp.VideoFile.FireOnLoopFinished(System.Object)">
+            <summary>
+            Löst das <see cref="E:Line5.Liconcomp.VideoFile.OnLoopFinished"/> Ereignis aus.
+            </summary>
+            <param name="element">Das Element, welches das Ereignis ausgelöst hat.</param>
+        </member>
+        <member name="M:Line5.Liconcomp.VideoFile.HookEvents">
+            <summary>
+            Wird von erbenden Klassen überschrieben um Ereignisbehandlungsmethoden zu
+            registrieren.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.VideoFile.UnhookEvents">
+            <summary>
+            Wird von erbenden Klassen überschrieben um Ereignisbehandlungsmethoden zu
+            entfernen.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.VideoFile.Pause">
+            <summary>
+            Pausiert das Video. Diese Methode kann auch genutzt werden um den Videostart
+            zu beschleunigen. Erstellen Sie dazu eine Instanz dieser Klasse, machen Sie sie
+            unsichtbar (<see cref="P:Line5.Liconcomp.Element.Visible"/>) und rufen Sie <see cref="M:Line5.Liconcomp.VideoFile.Pause"/> auf.
+            Ein nun folgender Aufruf von <see cref="M:Line5.Liconcomp.VideoFile.Play"/> wird das Video sofort abspielen.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.VideoFile.Play">
+            <summary>
+            Spielt das Video ab. Hat keine Wirkung wenn das Video bereits läuft.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.VideoFile.Stop">
+            <summary>
+            Stoppt die Wiedergabe des Videos. Hat keine Auswirkungen wenn das wieder bereits
+            gestoppt wurde.
+            </summary>
+        </member>
+        <member name="E:Line5.Liconcomp.VideoFile.OnLoopFinished">
+            <summary>
+            Wird ausgelöst, wenn das Video einmal komplett abgespielt wurde.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.VideoFile.TypedCOMObject">
+            <summary>
+            Eine private hilfseigenschaft um Casts in den restlichen Eigenschaften
+            und Methoden zu vermeiden.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.VideoFile.EndOfLineOverlap">
+            <summary>
+            Gibt das End-Of-Line-Overlap in Bildpunkten (Pixel) zurück oder setzt dieses.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.VideoFile.Filename">
+            <summary>
+            Gibt den Dateiname des Videos zurück.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.VideoFile.LineBreak">
+            <summary>
+            Gibt den Zeilenumbruch des Videos in Bildpunkten (Pixel) zurück oder
+            setzt diesen.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.VideoFile.LoopCount">
+            <summary>
+            Gibt zurück, wie oft das Video abgespielt werden soll oder setzt
+            die Anzahl der Wiederholungen. 0 bedeutet unendlich oft.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.VideoFile.OffsetX">
+            <summary>
+            Gibt das X-Offset in Bildpunkten (Pixel) zurück oder setzt dieses.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.VideoFile.OffsetY">
+            <summary>
+            Gibt das Y-Offset in Bildpunkten (Pixel) zurück oder setzt dieses.
+            </summary>
+        </member>
+        <member name="T:Line5.Liconcomp.Movement">
+            <summary>
+            Stellt eine Kapselung für die Liconcomp Schnittstelle <see cref="T:Liconcomp.IPosition"/>
+            dar. Dies ist nur eine Basisklasse. Nutzen Sie für die Positionsangabe
+            die Klasse <seealso cref="T:Line5.Liconcomp.StaticPosition"/>.
+            </summary>
+            <threadsafety static="true" instance="false"/>
+        </member>
+        <member name="F:Line5.Liconcomp.Movement._COMObject">
+            <summary>
+            COM Objekt für das Movement.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.Movement.#ctor">
+            <summary>
+            Erstellt eine neue Instanz dieser Klasse. Positionen und Movements
+            benötigen keine Instanz von Liconcomp und können selbst ohne eine
+            Instanz von <see cref="T:Line5.Liconcomp.Player"/> erstellt werden.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.Movement.#ctor(Liconcomp.IPosition)">
+            <summary>
+            Konstruktor, der kein neues Movement erstellt, sondern um ein
+            bestehendes Movement wrappt.
+            </summary>
+            <param name="COMObject">Das Movement, das gekapselt werden soll.</param>
+        </member>
+        <member name="M:Line5.Liconcomp.Movement.CreateMovement">
+            <summary>
+            Erbende Klassen wie <see cref="T:Line5.Liconcomp.StaticPosition"/> überschreiben diese
+            Methode um eine Instanz der von ihnen behandelten COM Klasse zu
+            erzeugen.
+            </summary>
+            <returns>Eine gültige Instanz einer Klasse, die <see cref="T:Liconcomp.IPosition"/>
+            implementiert.</returns>
+        </member>
+        <member name="M:Line5.Liconcomp.Movement.Dispose(System.Boolean)">
+            <summary>
+            Interne Methode um alle Instanzvariablen freizugeben. Diese Methode sollte von
+            erbenden Klassen überschrieben werden.
+            </summary>
+            <param name="Disposing"><see langword="true"/>, wenn der Aufruf vom Garbage
+            Collector stammt, sonst <see langword="false"/>.</param>
+        </member>
+        <member name="P:Line5.Liconcomp.Movement.COMObject">
+            <summary>
+            Gibt das gemanagte COM Objekt zurück.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.Movement.X">
+            <summary>
+            Gibt die X- Koordinate in Bildpunkten (Pixel) zurück. Dieser Wert kann
+            negativ sein.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.Movement.Y">
+            <summary>
+            Gibt die Y- Koordinate in Bildpunkten (Pixel) zurück. Dieser Wert kann
+            negativ sein.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.Movement.Z">
+            <summary>
+            Gibt die Z- Koordinate in Bildpunkten (Pixel) zurück. Dieser Wert kann
+            negativ sein.
+            </summary>
+        </member>
+        <member name="T:Line5.Liconcomp.Player">
+            <summary>
+            Kapselt eine Instanz von Liconcomp.
+            </summary>
+            <remarks>
+            <para>
+            Diese Klasse bildet den Haupteinstiegspunkt für das Liconcomp .Net Framework.
+            Erstellen Sie eine Instanz dieser Klasse um Liconcomp zu starten und anzuzeigen.
+            </para>
+            <para>
+            Nutzen Sie die Methode <see cref="M:Line5.Liconcomp.Player.CreateVideoFromFile(System.String)"/> um neue Videos
+            zu laden. Starten Sie die Videos mit <see cref="M:Line5.Liconcomp.VideoFile.Play"/>.
+            </para>
+            <para>
+            Beachten Sie, dass immer nur eine Instanz dieser Klasse aktiv sein kann. Im DEBUG
+            Modus wird dies überprüft. Das Erstellen einer zweiten Instanz löst dann eine
+            <see cref="T:System.InvalidOperationException"/> aus.
+            </para>
+            </remarks>
+            <threadsafety static="true" instance="false"/>
+        </member>
+        <member name="F:Line5.Liconcomp.Player._player">
+            <summary>
+            Das COM Objekt des Players.
+            </summary>
+        </member>
+        <member name="F:Line5.Liconcomp.Player._elements">
+            <summary>
+            Eine Liste aller Elemente, die diese Instanz erstellt hat. Diese Liste
+            soll zu einer späteren Version von Liconcomp bereitgestellt werden.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.Player.#ctor">
+            <summary>
+            Erstellt eine neue Instanz des Players. Beachten Sie immer nur eine
+            Instanz dieser Klasse zur gleichen Zeit zu erstellen. Im DEBUG Modus
+            wird eine <see cref="T:System.InvalidOperationException"/> ausgelöst,
+            sollten Sie versuchen eine zweite Instanz zu erzeugen, bevor die erste
+            freigegeben wurde.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.Player.RemoveElement(Line5.Liconcomp.Element)">
+            <summary>
+            Wird von <see cref="T:Line5.Liconcomp.Element"/> während seiner Freigabe aufgerufen. Wir müssen
+            das Element aus unserer Liste entfernen.
+            </summary>
+            <param name="element">Das zu entfernende Element.</param>
+            <exception cref="T:System.ArgumentNullException">Wird ausgelöst, wenn <paramref name="element"/>
+            <see langword="null"/> ist.</exception>
+        </member>
+        <member name="M:Line5.Liconcomp.Player.Dispose(System.Boolean)">
+            <summary>
+            Interne Methode um alle Instanzvariablen freizugeben. Diese Methode sollte von
+            erbenden Klassen überschrieben werden.
+            </summary>
+            <param name="Disposing"><see langword="true"/>, wenn der Aufruf vom Garbage
+            Collector stammt, sonst <see langword="false"/>.</param>
+        </member>
+        <member name="M:Line5.Liconcomp.Player.StartPlayer">
+            <summary>
+            Startet Liconcomp und setzt die Variable <see cref="F:Line5.Liconcomp.Player._player"/> auf die Instanz
+            von Liconcomp.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.Player.StopPlayer">
+            <summary>
+            Schließt die Verbindung zu Liconcomp. Der Player wird dabei nicht beendet.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.Player.RemoveAllElements">
+            <summary>
+            Entfernt alle sichtbaren und unsichtbaren Elemente vom Liconcomp Bildschirm.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.Player.CreateVideoFromFile(System.String)">
+            <summary>
+            Erstellt ein Video aus einer Datei. Die Datei sollte vorhanden sein und ein
+            gültiges Video enthalten. Anderenfalls ist das Verhalten dieser Methode
+            undefiniert.
+            </summary>
+            <param name="Filename">Vollständiger Pfad zur Video Datei.</param>
+            <returns>Eine Instanz der Klasse <see cref="T:Line5.Liconcomp.VideoFile"/>, welche das Video
+            beinhaltet.</returns>
+            <exception cref="T:Line5.Liconcomp.LiconcompException">Wird ausgelöst, wenn ein
+            Fehler auftritt.</exception>
+        </member>
+        <member name="M:Line5.Liconcomp.Player.SetBackgroundColor(System.Drawing.Color)">
+            <summary>
+            Setzt die Hintergrundfarbe für das Liconcomp Fenster.
+            </summary>
+            <param name="C">Die neue Hintergrundfarbe.</param>
+        </member>
+        <member name="M:Line5.Liconcomp.Player.SetBackgroundColor(System.Byte,System.Byte,System.Byte)">
+            <summary>
+            Setzt die Hintergrundfarbe für das Liconcomp Fenster.
+            </summary>
+            <param name="r">Der Rot Anteil der neuen Farbe.</param>
+            <param name="g">Der Grün Anteil der neuen Farbe.</param>
+            <param name="b">Der Blau Anteil der neuen Farbe.</param>
+        </member>
+        <member name="P:Line5.Liconcomp.Player.Elements">
+            <summary>
+            Gibt einen typisierten Enumerator aller momentan verfügbaren Elemente zurück.
+            Dieser Enumerator beinhaltet auch unsichtbare Elemente.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.Player.WindowHeight">
+            <summary>
+            Gibt die Fensterhöhe des Liconcomp Fensters in Bildpunkten (Pixel) zurück.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.Player.WindowWidth">
+            <summary>
+            Gibt die Fensterbreite des Liconcomp Fensters in Bildpunkten (Pixel) zurück.
+            </summary>
+        </member>
+        <member name="T:Line5.Liconcomp.LiconcompException">
+            <summary>
+            Genereller Liconcomp Fehler.
+            </summary>
+            <remarks>
+            <para>
+            Diese Fehlermeldung wird vom Framework verwendet, um Fehlermeldungen
+            von Liconcomp zu kapseln.
+            </para>
+            </remarks>
+            <threadsafety static="true" instance="true" />
+        </member>
+        <member name="M:Line5.Liconcomp.LiconcompException.#ctor(System.String)">
+            <summary>
+            Standardkonstruktor.
+            </summary>
+            <param name="Message">Die Fehlermeldung, die dem Benutzer angezeigt werden soll.</param>
+        </member>
+        <member name="T:Line5.Liconcomp.SyncCollection">
+            <summary>
+            Bietet eine Sammlung von <see cref="T:Line5.Liconcomp.Sync"/> Objekten zur besseren
+            Verwaltung an. Diese Klasse wird in der aktuellen Version des
+            Frameworks noch nicht benutzt!
+            </summary>
+        </member>
+        <member name="F:Line5.Liconcomp.SyncCollection._player">
+            <summary>
+            Referenz auf den Player, der die Liste verwaltet.
+            </summary>
+        </member>
+        <member name="F:Line5.Liconcomp.SyncCollection._list">
+            <summary>
+            Liste, die alle Instanzen von <see cref="T:Line5.Liconcomp.Sync"/> verwaltet.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.SyncCollection.#ctor(Line5.Liconcomp.Player)">
+            <summary>
+            Standardkonstruktor.
+            </summary>
+            <param name="Player">Eine Referenz auf den Player. Kann nicht <see langword="null"/> sein.</param>
+            <exception cref="T:System.ArgumentNullException">Wird ausgelöst, wenn <paramref name="Player"/>
+            <see langword="null"/> ist.</exception>
+        </member>
+        <member name="M:Line5.Liconcomp.SyncCollection.GetEnumerator">
+            <summary>
+            Liefert einen typisierten Enumerator für die Sammlung zurück.
+            </summary>
+            <returns>Einen typisierten Enumerator für die Sammlung der <see cref="T:Line5.Liconcomp.Sync"/> Instanzen.</returns>
+        </member>
+        <member name="M:Line5.Liconcomp.SyncCollection.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Liefert einen untypisierten Enumerator für die Sammlung zurück.
+            </summary>
+            <returns>Einen untypisierten Enumerator für die Sammlung der <see cref="T:Line5.Liconcomp.Sync"/> Instanzen.</returns>
+        </member>
+        <member name="T:Line5.Liconcomp.ElementRemoveEvent">
+            <summary>
+            Signalisiert, dass soeben ein Element (Video, Text, ...) vom Liconcomp
+            Elemente Pool entfernt wurde. Das Element ist danach nicht mehr benutzbar.
+            </summary>
+            <param name="Sender">Das Element, welches entfernt wurde.</param>
+            <param name="Args">Argumente.</param>
+        </member>
+        <member name="T:Line5.Liconcomp.Sync">
+            <summary>
+            Bietet Synchronisationsdienste für das gleichzeitige Ausführen
+            verschiedener Aktionen.
+            </summary>
+            <remarks>
+            <para>
+            Nutzen Sie <see cref="T:Line5.Liconcomp.Sync"/> um mehrere Videos gleichzeitig starten
+            zu lassen. Erstellen Sie die Videos, erstellen Sie eine Instanz von
+            <see cref="T:Line5.Liconcomp.Sync"/>, fügen Sie alle Videos mit der <see cref="M:Line5.Liconcomp.Sync.Add(Line5.Liconcomp.Element)"/>
+            Methode zu <see cref="T:Line5.Liconcomp.Sync"/> hinzu und rufen Sie anschließend
+            <see cref="M:Line5.Liconcomp.Sync.Play"/> auf. Die Videos werden gleichzeitig starten.
+            </para>
+            </remarks>
+            <threadsafety static="true" instance="false"/>
+        </member>
+        <member name="F:Line5.Liconcomp.Sync._player">
+            <summary>
+            Instanz des Players.
+            </summary>
+        </member>
+        <member name="F:Line5.Liconcomp.Sync._sync">
+            <summary>
+            Das gewrappte COM Objekt.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.Sync.#ctor(Line5.Liconcomp.Player)">
+            <summary>
+            Erstellt eine neue Instanz der Klasse.
+            </summary>
+            <param name="Player">Der Player, dem die Klasse zugeordnet werden soll. Kann
+            nicht <see langword="null"/> sein.</param>
+            <exception cref="T:System.ArgumentNullException">Wird ausgelöst, wenn <paramref name="Player"/>
+            <see langword="null"/> ist.</exception>
+        </member>
+        <member name="M:Line5.Liconcomp.Sync.Dispose(System.Boolean)">
+            <summary>
+            Interne Methode um alle Instanzvariablen freizugeben. Diese Methode sollte von
+            erbenden Klassen überschrieben werden.
+            </summary>
+            <param name="Disposing"><see langword="true"/>, wenn der Aufruf vom Garbage
+            Collector stammt, sonst <see langword="false"/>.</param>
+        </member>
+        <member name="M:Line5.Liconcomp.Sync.Add(Line5.Liconcomp.Element)">
+            <summary>
+            Fügt ein Element der Synchronisationsliste hinzu. Alle auf <see cref="T:Line5.Liconcomp.Sync"/>
+            ausgeführten Aktionen werden auch auf das neue Element ausgeführt.
+            </summary>
+            <param name="Element">Das Element, dass der Synchronisationsliste hinzugefügt
+            werden soll. Darf nicht <see langword="null"/> sein.</param>
+            <exception cref="T:System.ArgumentNullException">Wird ausgelöst, wenn <paramref name="Element"/>
+            <see langword="null"/> ist.</exception>
+        </member>
+        <member name="M:Line5.Liconcomp.Sync.Pause">
+            <summary>
+            Pausiert alle Videos in der Synchronisationsliste. Dieser Vorgang hat nur
+            auf Videos Einfluss. Lauftexte werden nicht gestoppt.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.Sync.Play">
+            <summary>
+            Startet alle Videos in der Synchronisationsliste. Dieser Vorgang hat nur
+            auf Videos Einfluss. Lauftexte werden nicht gestoppt.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.Sync.Stop">
+            <summary>
+            Stoppt alle Videos in der Synchronisationsliste. Dieser Vorgang hat nur
+            auf Videos Einfluss. Lauftexte werden nicht gestoppt.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.Sync.Visible">
+            <summary>
+            Setzt die <see cref="P:Line5.Liconcomp.Element.Visible"/> Eigenschaft aller Elemente
+            in der Synchronisationsliste. Somit können alle Elemente gleichzeitig ein-
+            oder ausgeblendet werden.
+            </summary>
+        </member>
+        <member name="T:Line5.Liconcomp.StaticPosition">
+            <summary>
+            Beschreibt eine Klasse, die eine feste Position ausdrückt. Nutzen
+            Sie diese Klasse um Objekte absolut auf dem Bildschirm zu positionieren.
+            Diese Klasse unterstützte keine Animationen oder Bewegungen. Es ist
+            jedoch möglich, die X, Y und Z Koordinate nach Instanziierung der
+            Klasse zu verändern.
+            </summary>
+            <threadsafety static="true" instance="false"/>
+        </member>
+        <member name="M:Line5.Liconcomp.StaticPosition.#ctor">
+            <summary>
+            Standardkonstruktor. Die Movement wird mit (0; 0; 0) initialisiert.
+            </summary>
+        </member>
+        <member name="M:Line5.Liconcomp.StaticPosition.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Die Movement wird mit den angegebenen Werten und 0 für Z initialisiert.
+            </summary>
+            <param name="x">Die X- Koordinate in Bildpunkten (Pixel).</param>
+            <param name="y">Die Y- Koordinate in Bildpunkten (Pixel).</param>
+        </member>
+        <member name="M:Line5.Liconcomp.StaticPosition.#ctor(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Die Movement wird mit den angegebenen Koordinaten initialisiert.
+            </summary>
+            <param name="x">Die X- Koordinate in Bildpunkten (Pixel).</param>
+            <param name="y">Die Y- Koordinate in Bildpunkten (Pixel).</param>
+            <param name="z">Die Z- Koordinate in Bildpunkten (Pixel).</param>
+        </member>
+        <member name="M:Line5.Liconcomp.StaticPosition.CreateMovement">
+            <summary>
+            Erbende Klassen wie <see cref="T:Line5.Liconcomp.StaticPosition"/> überschreiben diese
+            Methode um eine Instanz der von ihnen behandelten COM Klasse zu
+            erzeugen.
+            </summary>
+            <returns>
+            Eine gültige Instanz einer Klasse, die <see cref="T:Liconcomp.IPosition"/>
+            implementiert.
+            </returns>
+        </member>
+        <member name="P:Line5.Liconcomp.StaticPosition.X">
+            <summary>
+            Gibt die X- Koordinate in Bildpunkten (Pixel) zurück oder setzt diese.
+            Dieser Wert kann negativ sein.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.StaticPosition.Y">
+            <summary>
+            Gibt die Y- Koordinate in Bildpunkten (Pixel) zurück oder setzt diese.
+            Dieser Wert kann negativ sein.
+            </summary>
+        </member>
+        <member name="P:Line5.Liconcomp.StaticPosition.Z">
+            <summary>
+            Gibt die Z- Koordinate in Bildpunkten (Pixel) zurück oder setzt diese.
+            Dieser Wert kann negativ sein.
+            </summary>
+        </member>
+        <member name="T:Line5.Liconcomp.NamespaceDoc">
+            <summary>
+            Der Liconcomp .Net Framework Library Namensraum.
+            </summary>
+            <remarks>
+            <para>
+            Dieser Namensraum beinhaltet alle Klassen und Schnittstellen, die benötigt werden
+            um die Liconcomp COM Schnittstelle zu bedienen. Die Klasse <see cref="T:Line5.Liconcomp.Player"/>
+            dient als Einstiegspunkt.
+            </para>
+            </remarks>
+        </member>
+    </members>
+</doc>

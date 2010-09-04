@@ -1,0 +1,77 @@
+﻿<Window x:Class="Tie.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Tie Player - (c) Line5, 2010"
+    AllowDrop="False"
+    WindowState="Normal"
+    WindowStyle="ToolWindow"
+    WindowStartupLocation="Manual"
+    Height="300"
+    Width="545">
+    <Window.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <LinearGradientBrush.GradientStops>
+                <GradientStop Color="White" Offset="0.2" />
+                <GradientStop Color="#ffddddff" Offset="1" />
+            </LinearGradientBrush.GradientStops>
+        </LinearGradientBrush>
+    </Window.Background>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Border BorderBrush="Black" BorderThickness="1">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <LinearGradientBrush.GradientStops>
+                        <GradientStop Color="#ff838383" Offset="0"/>
+                        <GradientStop Color="#ff464646" Offset="0.47"/>
+                        <GradientStop Color="#ff3c3c3c" Offset="0.50"/>
+                        <GradientStop Color="#ff000000" Offset="1"/>
+                    </LinearGradientBrush.GradientStops>
+                </LinearGradientBrush>
+            </Border.Background>
+            <TextBlock
+                TextAlignment="Center"
+                FontSize="20"
+                FontWeight="Bold"
+                Foreground="White"
+                Grid.Row="0"
+                Padding="5"
+                Loaded="TextBlock_Loaded">
+                <TextBlock.Text>
+                    Tie Player
+                </TextBlock.Text>
+                <TextBlock.Effect>
+                    <DropShadowEffect x:Name="HeaderDropShadowEffect" BlurRadius="3" ShadowDepth="0" Color="White" />
+                </TextBlock.Effect>
+            </TextBlock>
+        </Border>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5">
+            <Label>Playlists</Label>
+            <ComboBox Width="200" Background="#80ffffff" Name="cbPlaylists" ItemsSource="{Binding Path=Playlists,Mode=OneWay}" DisplayMemberPath="Name" SelectedIndex="0" />
+            <Label>Movies</Label>
+            <ComboBox Width="200" Background="#80ffffff" Name="cbMovies" ItemsSource="{Binding ElementName=cbPlaylists,Path=SelectedValue.Movies}" DisplayMemberPath="Title" SelectedIndex="0"/>
+        </StackPanel> 
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="5">
+            <Label>Actions</Label>
+            <Button Command="{Binding Path=StartFloatingPlaybackCommand}" Margin="0,0,5,0">Start Floating</Button>
+            <Button Command="{Binding Path=StartPlaylistPlaybackCommand}" Margin="0,0,5,0">Start Playlists</Button>
+            <Button Command="{Binding Path=BlankScreenCommand}">Blank Screen</Button>
+        </StackPanel>
+        <ListBox
+            VerticalAlignment="Stretch"
+            Grid.Row="3"
+            Background="#80ffffff"
+            ScrollViewer.IsDeferredScrollingEnabled="True"
+            ScrollViewer.VerticalScrollBarVisibility="Visible"
+            ScrollViewer.HorizontalScrollBarVisibility="Auto"
+            ItemsSource="{Binding Path=Messages}"/>
+    </Grid>
+</Window>
